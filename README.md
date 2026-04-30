@@ -5,7 +5,8 @@ Landing page for **Van + Zack the AI editor** — a weekly newsletter about AI t
 ## Stack
 
 - Static HTML + CSS. No build step.
-- Deployed via Cloudflare Pages → auto-deploys on every push to `main`.
+- Deployed via Cloudflare Workers → auto-deploys on every push to `main`.
+- **Live at:** https://vanzackai.co.za (apex + `www`). Workers default URL `https://vanandzack.zack-slumiesboi.workers.dev/` still works as fallback.
 
 ## Edit + ship
 
@@ -27,4 +28,4 @@ Cloudflare rebuilds in ~30 seconds.
 
 ## Subscribe link
 
-The Subscribe CTA points to `https://vanandzack.substack.com`. Update this once the Substack publication is live (or swap for a different URL).
+The Subscribe CTA points to `https://vanzackai.substack.com` (Substack publication, live as of 2026-04-30).
