@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>10 SEO Prompts That Actually Work — Van + Zack</title>
+  <meta name="description" content="Ten copy-pasteable AI prompts for SEO that go beyond 'write me a blog post.' Free, no email gate. From Van + Zack." />
+  <link rel="canonical" href="https://vanzackai.co.za/prompts/" />
+  <meta property="og:title" content="10 SEO Prompts That Actually Work" />
+  <meta property="og:description" content="Copy-pasteable AI prompts for real SEO work. No 'rewrite my blog post' fluff. Free." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://vanzackai.co.za/prompts/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@VanZackAI" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x1F480;</text></svg>" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .prompt-card {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .prompt-card:last-of-type { border-bottom: none; }
+    .prompt-card h3 {
+      color: var(--fg);
+      font-size: 1.15rem;
+      margin: 0 0 6px;
+      font-weight: 700;
+    }
+    .prompt-card .number {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      background: var(--accent);
+      color: var(--accent-fg);
+      border-radius: 50%;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    .prompt-card .use-when {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0 0 14px;
+    }
+    .prompt-card pre {
+      background: #1a1a1d;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      padding: 14px 16px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--fg);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0 0 12px;
+    }
+    .prompt-card .why {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin: 0;
+      font-style: italic;
+    }
+    .breadcrumb {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin: 0 0 32px;
+    }
+    .breadcrumb a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--muted);
+    }
+    .breadcrumb a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="breadcrumb"><a href="/">← Van + Zack</a></p>
+
+    <header class="hero">
+      <p class="kicker">Free · No email required</p>
+      <h1>10 SEO prompts that actually work.</h1>
+      <p class="sub">Most "AI for SEO" prompts are just "write me a blog post." These aren't. Ten specific, scoped prompts you can copy into Claude or ChatGPT today.</p>
+      <a class="cta" href="https://vanzackai.substack.com" target="_blank" rel="noopener">Get one of these every week</a>
+      <p class="micro">Free newsletter. We email when we ship something useful. That's it.</p>
+    </header>
+
+    <section class="block">
+      <h2>How to use these</h2>
+      <ul>
+        <li><strong>Replace the bracketed bits.</strong> [Your draft], [your URL list], etc.</li>
+        <li><strong>Paste into Claude or ChatGPT.</strong> Both work. Claude's drafts tend to be tighter.</li>
+        <li><strong>Don't ship the first response.</strong> The model gets sharper after one round of "now do it again, but ___." Ask twice.</li>
+      </ul>
+    </section>
+
+    <article class="prompt-card">
+      <h3><span class="number">1</span>The CTR Title Rewriter</h3>
+      <p class="use-when">Use when: a published page has impressions but a low click-through rate.</p>
+<pre>Here is my page title and meta description for a page targeting the query "[primary keyword]":
+
+Title: [current title]
+Meta: [current meta]
+
+Rewrite the title 5 different ways to maximize CTR for this query. For each:
+1. Front-load the keyword.
+2. Add a specificity hook (number, year, comparison, or "vs").
+3. Stay under 60 characters.
+
+Then rate each one 1-10 on likely CTR vs the original, with a one-sentence why.</pre>
+      <p class="why">Why it works: forces specific tactics (front-loading, specificity hook) and forces self-evaluation. Generic "improve my title" gets you generic.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">2</span>The Meta Description That Earns the Click</h3>
+      <p class="use-when">Use when: same page, new meta description, ~155 characters.</p>
+<pre>For a page targeting "[primary keyword]" with this content summary:
+
+[1-2 sentences of what the page actually delivers]
+
+Write 3 meta descriptions that:
+- Lead with the *outcome* the reader gets, not the topic.
+- Include a soft objection-handler ("without [the painful thing]").
+- Stay under 155 characters.
+- Don't use the words "discover," "unlock," or "learn how."
+
+Tell me which one is most likely to earn the click and why.</pre>
+      <p class="why">Why it works: bans the marketing-cliché vocabulary that signals AI slop and forces outcome-led framing.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">3</span>The FAQ Schema Generator</h3>
+      <p class="use-when">Use when: you want featured-snippet eligibility on an existing article.</p>
+<pre>Read this article: [paste article text]
+
+Identify the 5 questions a real reader would type into Google after reading it (questions the article *almost* answers but doesn't fully).
+
+For each, write:
+- The question, phrased exactly as a person would type it (not a marketer).
+- A 40-60 word answer drawn ONLY from the article. If the article doesn't fully answer it, say "article gap" — don't invent.
+
+Output as a single JSON-LD FAQPage schema block I can paste into the page head.</pre>
+      <p class="why">Why it works: the "article gap" instruction is the trick — it surfaces content holes you can fill, instead of letting the model hallucinate answers.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">4</span>The Internal Link Suggester</h3>
+      <p class="use-when">Use when: you have a list of existing articles and a new draft.</p>
+<pre>Here is my new article draft:
+
+[paste draft]
+
+Here is a list of my existing published articles (URL — title — one-line summary):
+
+[paste list]
+
+Suggest internal links: 3-6 places in the new article where I should link to one of the existing articles. For each, give me:
+- The exact sentence in the draft to add the link to.
+- The URL to link to.
+- The anchor text (3-6 words, descriptive, not "click here").
+- Why this link helps the reader (not "for SEO" — for the reader).
+
+Skip links that feel forced.</pre>
+      <p class="why">Why it works: "skip links that feel forced" is what stops the model from over-linking. The reader-justification keeps you honest.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">5</span>The Featured-Snippet Targeting Pass</h3>
+      <p class="use-when">Use when: you're writing a new piece and want a shot at position zero.</p>
+<pre>I'm writing a piece targeting the query "[query]". Here's my outline:
+
+[paste outline]
+
+For the H2 most likely to win the featured snippet on this query:
+1. Tell me which H2 it is and why.
+2. Rewrite that section's first paragraph as a 40-60 word direct answer to the query, structured how Google's snippet engine prefers (definition first, then 1-2 sentences of context).
+3. Suggest a small list or table to add right after, since those compete for snippets too.</pre>
+      <p class="why">Why it works: most snippet content is bloated. The 40-60 word constraint and "definition first" structure mirror what actually wins snippets.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">6</span>The Content Brief Critic</h3>
+      <p class="use-when">Use when: someone (you, an agency, a freelancer) hands you a content brief.</p>
+<pre>Here is a content brief for a piece targeting "[query]":
+
+[paste brief]
+
+Be a skeptical senior SEO reviewing this brief. Tell me:
+1. Is the search intent correctly identified? (informational, commercial, navigational, transactional — and what subtype)
+2. Are the H2s in the right order for that intent, or are they in "what's easy to write" order?
+3. What's the one thing this brief is missing that competitors ranking for this query have addressed?
+4. Rate the brief 1-10. If under 7, rewrite the weakest H2.
+
+Be direct. Don't soften.</pre>
+      <p class="why">Why it works: "be direct, don't soften" is doing real work — the model defaults to flattering review. Naming the role ("skeptical senior SEO") gets you better critique.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">7</span>The Cannibalization Detector</h3>
+      <p class="use-when">Use when: you suspect two pages on your site are competing for the same query.</p>
+<pre>Here are two pages from my site:
+
+PAGE A:
+URL: [url-a]
+Title: [title]
+Meta: [meta]
+First 300 words: [excerpt]
+
+PAGE B:
+URL: [url-b]
+Title: [title]
+Meta: [meta]
+First 300 words: [excerpt]
+
+Are these pages cannibalizing each other on Google? If yes:
+1. Which one should be the canonical winner and why (specifically what makes it stronger).
+2. What should happen to the loser: redirect, consolidate, or rescope to a different query? Recommend one.
+3. If "rescope," suggest the new query and a fresh angle.</pre>
+      <p class="why">Why it works: forces a recommendation, not just analysis. The "specifically what makes it stronger" prevents vague "page A is better."</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">8</span>The Helpful-Content Audit Pass</h3>
+      <p class="use-when">Use when: a page is underperforming and you suspect it's getting downranked by Google's helpful-content systems.</p>
+<pre>Read this page: [paste content]
+
+Audit it against Google's stated "people-first content" criteria. For each of these 8 questions, score 1-5 and explain in one sentence:
+
+1. Does it provide original analysis or just rehash what's already ranking?
+2. Does it demonstrate first-hand expertise (not just summarized expertise)?
+3. Will a reader feel they got their question answered fully?
+4. Will a reader feel they need to search again to verify or fill gaps?
+5. Is the title an accurate summary or a clickbait promise?
+6. Is the page padded with content the reader didn't ask for (long intros, irrelevant context)?
+7. Does it answer the *next* question a reader would have, not just the headline one?
+8. Would a domain expert in this field find anything wrong or thin in it?
+
+Then give me the 2 highest-leverage fixes.</pre>
+      <p class="why">Why it works: these are Google's own questions from their helpful-content guidance. The "highest-leverage fixes" instruction stops you from drowning in 8 small to-dos.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">9</span>The Reader's First-Question Test</h3>
+      <p class="use-when">Use when: editing a draft. This is the single highest-ROI prompt in the list.</p>
+<pre>Here's my draft for a piece targeting "[query]":
+
+[paste draft]
+
+Imagine the reader who just typed [query] into Google and clicked your result. They're skimming the first 200 words.
+
+1. What is the FIRST question their brain is asking as they land?
+2. Where in the draft does that question get answered?
+3. If it's not in the first 200 words: rewrite the opening so it IS.
+
+Do this without adding fluff or padding.</pre>
+      <p class="why">Why it works: this is the entire game of on-page SEO and most drafts fail it. The constraint "without adding fluff" is what stops the model from "improving" your intro into corporate slop.</p>
+    </article>
+
+    <article class="prompt-card">
+      <h3><span class="number">10</span>The Competitor Gap Question</h3>
+      <p class="use-when">Use when: you're outranked and want to know what the top results have that you don't.</p>
+<pre>Here are summaries of the top 3 ranking pages for the query "[query]":
+
+PAGE 1 ([domain]): [200-word summary]
+PAGE 2 ([domain]): [200-word summary]
+PAGE 3 ([domain]): [200-word summary]
+
+Here's mine, currently ranking position [N]: [200-word summary]
+
+Identify:
+1. The one topic ALL three competitors cover that I don't. (Just one — the most important.)
+2. The one structural element (table, comparison, calculator, original data, expert quote) that 2+ of them have and I don't.
+3. The one *thing I do better* that I should make more prominent on the page.
+
+Don't give me a list of 12 things. Just the highest-leverage gap and what's already working.</pre>
+      <p class="why">Why it works: the "just one" constraint prevents the audit-paralysis death-spiral. Knowing your own strength is just as important as knowing competitors'.</p>
+    </article>
+
+    <section class="block cta-block">
+      <h2>Want one prompt like this every week?</h2>
+      <p>That's the newsletter. One real prompt or workflow, tested. One honest tool review. No filler.</p>
+      <a class="cta" href="https://vanzackai.substack.com" target="_blank" rel="noopener">Subscribe — free</a>
+      <p class="micro">Free, weekly, easy to leave.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      <a href="/">vanzackai.co.za</a>
+      &nbsp;·&nbsp;
+      <a href="https://x.com/VanZackAI" target="_blank" rel="noopener">@VanZackAI</a>
+      &nbsp;·&nbsp;
+      <a href="https://vanzackai.substack.com" target="_blank" rel="noopener">Substack</a>
+    </p>
+    <p class="fineprint">&copy; Van + Zack. Built by Zack. Edited by Van. Steal these prompts freely.</p>
+  </footer>
+</body>
+</html>
