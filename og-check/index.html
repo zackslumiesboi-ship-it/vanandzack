@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OG Check — Diagnose your share card in 5 seconds | Van + Zack</title>
+  <meta name="description" content="Free tool: paste a URL, see if your Open Graph and Twitter card meta tags are broken, missing, or misconfigured. Get the fix in one paste." />
+  <link rel="canonical" href="https://vanzackai.co.za/og-check/" />
+  <meta property="og:title" content="OG Check — Diagnose your share card in 5 seconds" />
+  <meta property="og:description" content="Free tool: paste a URL, see if your Open Graph + Twitter card tags are broken. Get the fix in one paste." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://vanzackai.co.za/og-check/" />
+  <meta property="og:image" content="https://vanzackai.co.za/assets/social-card.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="800" />
+  <meta property="og:image:alt" content="A red editor's pen circling an HTML meta tag on a printed proof — Van + Zack the AI editor." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@VanZackAI" />
+  <meta name="twitter:image" content="https://vanzackai.co.za/assets/social-card.png" />
+  <meta name="twitter:image:alt" content="A red editor's pen circling an HTML meta tag on a printed proof." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x1F480;</text></svg>" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .breadcrumb { font-size: 0.85rem; color: var(--muted); margin: 0 0 32px; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); }
+    .breadcrumb a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .audit-form { display: flex; gap: 10px; margin: 24px 0 8px; flex-wrap: wrap; }
+    .audit-form input[type=url] {
+      flex: 1; min-width: 240px; padding: 13px 16px; font-size: 1rem;
+      background: #1a1a1d; color: var(--fg); border: 1px solid var(--line);
+      border-radius: 6px; font-family: inherit;
+    }
+    .audit-form input[type=url]:focus { outline: none; border-color: var(--accent); }
+    .audit-form button {
+      padding: 13px 24px; font-size: 1rem; background: var(--accent); color: var(--accent-fg);
+      border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: transform 0.06s ease, opacity 0.15s ease;
+    }
+    .audit-form button:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.92; }
+    .audit-form button:disabled { opacity: 0.5; cursor: wait; }
+
+    .results { display: none; margin-top: 32px; }
+    .results.visible { display: block; }
+
+    .grade-row { display: flex; gap: 20px; align-items: center; padding: 24px 0; border-bottom: 1px solid var(--line); }
+    .grade-badge {
+      width: 84px; height: 84px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem; font-weight: 700; flex-shrink: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .grade-A { background: #6abf69; color: #0e0e10; }
+    .grade-B { background: #a8d268; color: #0e0e10; }
+    .grade-C { background: #f1c40f; color: #0e0e10; }
+    .grade-D { background: #e67e22; color: #0e0e10; }
+    .grade-F { background: #e74c3c; color: #fff; }
+    .grade-meta h2 { margin: 0 0 4px; font-size: 1.3rem; }
+    .grade-meta p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+    .section { padding: 24px 0; border-bottom: 1px solid var(--line); }
+    .section:last-of-type { border-bottom: none; }
+    .section h3 {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 1.05rem;
+      color: var(--fg); margin: 0 0 14px; font-weight: 700; letter-spacing: -0.005em;
+    }
+
+    .issue {
+      padding: 14px 16px; margin-bottom: 12px;
+      background: #1a1a1d; border-radius: 6px;
+      border-left: 4px solid var(--line);
+    }
+    .issue.severity-high   { border-left-color: #e74c3c; }
+    .issue.severity-medium { border-left-color: #e67e22; }
+    .issue.severity-low    { border-left-color: #f1c40f; }
+    .issue-title { font-weight: 600; margin: 0 0 6px; color: var(--fg); }
+    .issue-why { color: var(--muted); font-size: 0.92rem; margin: 0 0 10px; line-height: 1.5; }
+    .issue-fix { position: relative; }
+    .issue-fix pre {
+      background: #0a0a0c; border: 1px solid var(--line); border-left: 2px solid var(--accent);
+      padding: 10px 12px; border-radius: 4px; overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82rem; color: var(--fg); margin: 0;
+      white-space: pre-wrap; word-wrap: break-word;
+    }
+    .copy-btn {
+      position: absolute; top: 6px; right: 6px;
+      padding: 3px 9px; font-size: 0.72rem; background: var(--accent); color: var(--accent-fg);
+      border: none; border-radius: 3px; cursor: pointer; font-weight: 600; font-family: inherit;
+    }
+
+    .present { font-size: 0.9rem; color: var(--muted); }
+    .present .ok { color: #6abf69; margin-right: 6px; }
+
+    .preview-card {
+      max-width: 520px; margin: 12px 0;
+      border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+      background: #1a1a1d; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .preview-card .img { aspect-ratio: 1.91 / 1; background: #2a2a2d; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.85rem; }
+    .preview-card .img.no-image::before { content: "(no image set — X will show a small domain card instead)"; padding: 0 20px; text-align: center; }
+    .preview-card .meta { padding: 12px 14px; border-top: 1px solid var(--line); }
+    .preview-card .domain { font-size: 0.78rem; color: var(--muted); text-transform: lowercase; margin: 0 0 4px; }
+    .preview-card .ttl { font-size: 0.96rem; font-weight: 600; color: var(--fg); margin: 0 0 4px; line-height: 1.3; }
+    .preview-card .desc { font-size: 0.86rem; color: var(--muted); margin: 0; line-height: 1.4; }
+
+    .err {
+      padding: 16px 18px; background: rgba(231, 76, 60, 0.08);
+      border: 1px solid rgba(231, 76, 60, 0.4); border-radius: 6px;
+      color: #ff8579; font-size: 0.95rem;
+    }
+    .loading { color: var(--muted); margin: 18px 0; font-size: 0.95rem; }
+    .examples { margin: 8px 0 0; font-size: 0.85rem; color: var(--muted); }
+    .examples a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); margin-right: 12px; }
+    .examples a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="breadcrumb"><a href="/">← Van + Zack</a></p>
+
+    <header class="hero">
+      <p class="kicker">Free tool · No signup</p>
+      <h1>Your share card is probably broken.<br/>Find out in 5 seconds.</h1>
+      <p class="sub">Paste a URL. We fetch the page, check every Open Graph and Twitter card meta tag, grade the setup, and hand you the exact fix to paste back into your &lt;head&gt;.</p>
+
+      <form class="audit-form" id="audit-form">
+        <input type="url" id="url-input" placeholder="https://your-site.com/page" required autocomplete="off" />
+        <button type="submit" id="audit-btn">Audit</button>
+      </form>
+      <p class="examples">
+        Try:
+        <a href="#" data-url="https://beomniscient.com/blog/chatgpt-for-seo/">an SEO agency's blog</a>
+        <a href="#" data-url="https://stripe.com/">stripe.com</a>
+        <a href="#" data-url="https://vanzackai.co.za/">our own site</a>
+      </p>
+    </header>
+
+    <div id="results" class="results"></div>
+
+    <section class="block cta-block">
+      <h2>Get one tool like this every week</h2>
+      <p>Built this in a weekend. The newsletter is where we ship the bigger workflows — AI-curated, human-edited, no fluff.</p>
+      <a class="cta" href="https://vanzackai.substack.com" target="_blank" rel="noopener">Subscribe — free</a>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      <a href="/">vanzackai.co.za</a>
+      &nbsp;·&nbsp;
+      <a href="https://x.com/VanZackAI" target="_blank" rel="noopener">@VanZackAI</a>
+      &nbsp;·&nbsp;
+      <a href="https://vanzackai.substack.com" target="_blank" rel="noopener">Substack</a>
+    </p>
+    <p class="fineprint">&copy; Van + Zack. Built by Zack. Edited by Van.</p>
+  </footer>
+
+  <script>
+    const form = document.getElementById('audit-form');
+    const input = document.getElementById('url-input');
+    const btn = document.getElementById('audit-btn');
+    const results = document.getElementById('results');
+
+    document.querySelectorAll('.examples a').forEach(a => {
+      a.addEventListener('click', e => { e.preventDefault(); input.value = a.dataset.url; form.dispatchEvent(new Event('submit', { cancelable: true })); });
+    });
+
+    function esc(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+    function renderError(msg) {
+      results.classList.add('visible');
+      results.innerHTML = `<div class="err">${esc(msg)}</div>`;
+    }
+
+    function renderResults(data) {
+      const a = data.audit;
+      const tags = data.tags || {};
+      const domain = (() => { try { return new URL(data.target).hostname.replace(/^www\./, ''); } catch { return data.target; }})();
+      const ogImage = tags['twitter:image'] || tags['og:image'] || '';
+      const cardTitle = tags['twitter:title'] || tags['og:title'] || data.pageTitle || '(no title)';
+      const cardDesc = tags['twitter:description'] || tags['og:description'] || '';
+
+      const issuesHtml = a.issues.length ? a.issues.map(i => `
+        <div class="issue severity-${esc(i.severity)}">
+          <p class="issue-title">${esc(i.title)}</p>
+          <p class="issue-why">${esc(i.why)}</p>
+          ${i.fix ? `<div class="issue-fix"><button class="copy-btn" data-copy="${esc(i.fix)}">copy</button><pre>${esc(i.fix)}</pre></div>` : ''}
+        </div>
+      `).join('') : '<p class="present" style="margin:0;">No issues. Ship as-is.</p>';
+
+      const presentHtml = a.present.length ? a.present.map(p =>
+        `<div style="padding:6px 0;"><span class="ok">✓</span><code>${esc(p.key)}</code> <span style="color:var(--muted); font-size:0.85rem;">— ${esc(String(p.value).slice(0, 110))}${String(p.value).length > 110 ? '…' : ''}</span></div>`
+      ).join('') : '<p class="present">Nothing core present.</p>';
+
+      const previewHtml = `
+        <div class="preview-card">
+          <div class="img ${ogImage ? '' : 'no-image'}" ${ogImage ? `style="background-image:url('${esc(ogImage)}')"` : ''}></div>
+          <div class="meta">
+            <p class="domain">${esc(domain)}</p>
+            <p class="ttl">${esc(cardTitle)}</p>
+            <p class="desc">${esc(cardDesc) || '<span style="color:#e74c3c;">(no description set)</span>'}</p>
+          </div>
+        </div>
+      `;
+
+      results.classList.add('visible');
+      results.innerHTML = `
+        <div class="grade-row">
+          <div class="grade-badge grade-${esc(a.grade)}">${esc(a.grade)}</div>
+          <div class="grade-meta">
+            <h2>Grade ${esc(a.grade)}</h2>
+            <p>${esc(a.summary)} on <code>${esc(domain)}</code></p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>How your card renders on X</h3>
+          ${previewHtml}
+          <p style="font-size:0.82rem; color:var(--muted); margin:8px 0 0;">Approximation. Real X cards adjust based on viewport and image dimensions.</p>
+        </div>
+
+        <div class="section">
+          <h3>Issues (${a.issues.length})</h3>
+          ${issuesHtml}
+        </div>
+
+        <div class="section">
+          <h3>What's already working (${a.present.length})</h3>
+          ${presentHtml}
+        </div>
+      `;
+
+      results.querySelectorAll('.copy-btn').forEach(b => {
+        b.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(b.dataset.copy);
+            const orig = b.textContent;
+            b.textContent = 'copied';
+            setTimeout(() => { b.textContent = orig; }, 1400);
+          } catch (e) { b.textContent = 'failed'; }
+        });
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = input.value.trim();
+      if (!url) return;
+      btn.disabled = true; btn.textContent = 'Auditing…';
+      results.classList.add('visible');
+      results.innerHTML = '<p class="loading">Fetching the page and inspecting tags…</p>';
+      try {
+        const r = await fetch('/og-check/audit?url=' + encodeURIComponent(url));
+        const data = await r.json();
+        if (!r.ok || data.error) { renderError(data.error || `HTTP ${r.status}`); }
+        else { renderResults(data); }
+      } catch (err) { renderError('Network error: ' + err.message); }
+      finally { btn.disabled = false; btn.textContent = 'Audit'; }
+    });
+  </script>
+</body>
+</html>
