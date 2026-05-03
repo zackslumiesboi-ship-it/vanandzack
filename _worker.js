@@ -1,9 +1,15 @@
-// Cloudflare Pages Function: /og-check/audit
-// Fetches a target URL server-side, parses Open Graph + Twitter card meta tags
-// via HTMLRewriter, and returns a structured audit (grade, issues, present-tags,
-// suggested fixes).
+// Cloudflare Worker entrypoint for vanandzack.
+//
+// Architecture: Workers + Static Assets. The ASSETS binding (auto-injected by
+// the Workers Static Assets runtime) serves the static HTML/CSS/PNG files in
+// this repo. This script intercepts dynamic API routes BEFORE the static
+// fallback. Add new API routes here.
+//
+// Routes:
+//   GET /og-check/audit?url=<URL>  -> JSON OG/Twitter card audit
+//   *                              -> static asset fallback (env.ASSETS)
 
-const REQUIRED = {
+const REQUIRED_TAGS = {
   "og:title": "Open Graph title — what platforms display in the card. Without this, they fall back to <title>, which is often the wrong copy for social sharing.",
   "og:description": "Open Graph description — the line under the title in the share card.",
   "og:image": "Open Graph image — the preview thumbnail. Without it, X shows a tiny domain-only card instead of a big visual.",
@@ -14,63 +20,78 @@ const REQUIRED = {
 };
 
 const SUGGEST = {
-  "og:title": (t) => `<meta property="og:title" content="${esc(t.pageTitle || "Your page title")}">`,
+  "og:title": (ctx) => `<meta property="og:title" content="${esc(ctx.pageTitle || "Your page title")}">`,
   "og:description": () => `<meta property="og:description" content="A clear one-sentence description of this page (max ~155 chars).">`,
   "og:image": () => `<meta property="og:image" content="https://your-domain.com/path/to/social-card.png">`,
-  "og:url": (t) => `<meta property="og:url" content="${esc(t.url)}">`,
+  "og:url": (ctx) => `<meta property="og:url" content="${esc(ctx.url)}">`,
   "og:type": () => `<meta property="og:type" content="website">`,
   "twitter:card": () => `<meta name="twitter:card" content="summary_large_image">`,
-  "twitter:image": (t) => `<meta name="twitter:image" content="${esc(t.tags["og:image"] || "https://your-domain.com/path/to/social-card.png")}">`,
+  "twitter:image": (ctx) => `<meta name="twitter:image" content="${esc(ctx.tags["og:image"] || "https://your-domain.com/path/to/social-card.png")}">`,
 };
 
-function esc(s) { return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function esc(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
-function json(obj, status = 200) {
+function jsonResponse(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=60" },
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "public, max-age=60",
+    },
   });
 }
 
-export async function onRequestGet({ request }) {
+async function handleAudit(request) {
   const reqUrl = new URL(request.url);
   const target = reqUrl.searchParams.get("url");
-  if (!target) return json({ error: "Missing ?url= parameter." }, 400);
+  if (!target) return jsonResponse({ error: "Missing ?url= parameter." }, 400);
 
   let parsed;
   try {
     parsed = new URL(target);
-    if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("URL must be http(s)");
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      throw new Error("URL must be http(s)");
+    }
   } catch (e) {
-    return json({ error: `Invalid URL: ${e.message}` }, 400);
+    return jsonResponse({ error: `Invalid URL: ${e.message}` }, 400);
   }
 
-  // Fetch with a 10s budget and a UA that identifies us honestly.
   let resp;
   try {
     resp = await fetch(parsed.toString(), {
       headers: {
         "User-Agent": "Mozilla/5.0 (compatible; OG-Check/1.0; +https://vanzackai.co.za/og-check/)",
-        "Accept": "text/html,application/xhtml+xml",
+        Accept: "text/html,application/xhtml+xml",
       },
       redirect: "follow",
       cf: { cacheTtl: 60 },
       signal: AbortSignal.timeout(10000),
     });
   } catch (e) {
-    return json({ error: `Fetch failed: ${e.message}`, target: parsed.toString() }, 502);
+    return jsonResponse({ error: `Fetch failed: ${e.message}`, target: parsed.toString() }, 502);
   }
 
   if (!resp.ok) {
-    return json({ error: `Target returned ${resp.status} ${resp.statusText}`, target: parsed.toString() }, 502);
+    return jsonResponse(
+      { error: `Target returned ${resp.status} ${resp.statusText}`, target: parsed.toString() },
+      502
+    );
   }
 
   const ctype = (resp.headers.get("content-type") || "").toLowerCase();
   if (!ctype.includes("html") && !ctype.includes("xml")) {
-    return json({ error: `Target is not HTML (got "${ctype || "unknown content-type"}")`, target: parsed.toString() }, 415);
+    return jsonResponse(
+      { error: `Target is not HTML (got "${ctype || "unknown content-type"}")`, target: parsed.toString() },
+      415
+    );
   }
 
-  // Parse meta tags + <title>.
   const tags = {};
   const titleParts = [];
   let inTitle = false;
@@ -85,22 +106,28 @@ export async function onRequestGet({ request }) {
     })
     .on("title", {
       element() { inTitle = true; },
-      text(t) { if (inTitle) titleParts.push(t.text); if (t.lastInTextNode) inTitle = false; },
+      text(t) {
+        if (inTitle) titleParts.push(t.text);
+        if (t.lastInTextNode) inTitle = false;
+      },
     })
     .on("link[rel='canonical']", {
-      element(el) { const href = el.getAttribute("href"); if (href) tags["link:canonical"] = href; },
+      element(el) {
+        const href = el.getAttribute("href");
+        if (href) tags["link:canonical"] = href;
+      },
     });
 
   try {
     await rewriter.transform(resp).text();
   } catch (e) {
-    return json({ error: `HTML parse failed: ${e.message}`, target: parsed.toString() }, 500);
+    return jsonResponse({ error: `HTML parse failed: ${e.message}`, target: parsed.toString() }, 500);
   }
 
   const pageTitle = titleParts.join("").replace(/\s+/g, " ").trim();
   const audit = analyze(tags, pageTitle, parsed.toString());
 
-  return json({
+  return jsonResponse({
     target: parsed.toString(),
     pageTitle,
     finalUrl: resp.url,
@@ -114,8 +141,7 @@ function analyze(tags, pageTitle, url) {
   const issues = [];
   const present = [];
 
-  // Coverage check
-  for (const [key, why] of Object.entries(REQUIRED)) {
+  for (const [key, why] of Object.entries(REQUIRED_TAGS)) {
     if (tags[key]) {
       present.push({ key, value: tags[key] });
     } else {
@@ -129,7 +155,6 @@ function analyze(tags, pageTitle, url) {
     }
   }
 
-  // og:title vs og:description year-mismatch (the bug we caught on Omniscient).
   if (tags["og:title"] && tags["og:description"]) {
     const yr = /\b(20\d{2})\b/;
     const t = (tags["og:title"].match(yr) || [])[1];
@@ -145,7 +170,6 @@ function analyze(tags, pageTitle, url) {
     }
   }
 
-  // twitter:card declares large image but no image set
   if (tags["twitter:card"] === "summary_large_image" && !tags["twitter:image"] && !tags["og:image"]) {
     issues.push({
       severity: "high",
@@ -156,7 +180,6 @@ function analyze(tags, pageTitle, url) {
     });
   }
 
-  // og:image without dimensions
   if (tags["og:image"] && (!tags["og:image:width"] || !tags["og:image:height"])) {
     issues.push({
       severity: "low",
@@ -167,7 +190,6 @@ function analyze(tags, pageTitle, url) {
     });
   }
 
-  // og:image without alt
   if (tags["og:image"] && !tags["og:image:alt"] && !tags["twitter:image:alt"]) {
     issues.push({
       severity: "low",
@@ -178,7 +200,6 @@ function analyze(tags, pageTitle, url) {
     });
   }
 
-  // Title length (X displays first ~70 chars, then truncates)
   if (tags["og:title"] && tags["og:title"].length > 70) {
     issues.push({
       severity: "low",
@@ -189,7 +210,6 @@ function analyze(tags, pageTitle, url) {
     });
   }
 
-  // Description length
   if (tags["og:description"] && tags["og:description"].length > 200) {
     issues.push({
       severity: "low",
@@ -200,7 +220,6 @@ function analyze(tags, pageTitle, url) {
     });
   }
 
-  // Banned marketer-speak in description (gentle nudge)
   if (tags["og:description"] && /\b(leverage|unlock|discover|revolutionize|game.changer|deep dive)\b/i.test(tags["og:description"])) {
     issues.push({
       severity: "low",
@@ -211,10 +230,9 @@ function analyze(tags, pageTitle, url) {
     });
   }
 
-  // Grade from issues
-  const high = issues.filter(i => i.severity === "high").length;
-  const med = issues.filter(i => i.severity === "medium").length;
-  const low = issues.filter(i => i.severity === "low").length;
+  const high = issues.filter((i) => i.severity === "high").length;
+  const med = issues.filter((i) => i.severity === "medium").length;
+  const low = issues.filter((i) => i.severity === "low").length;
   let grade;
   if (high === 0 && med === 0 && low === 0) grade = "A";
   else if (high === 0 && med === 0) grade = "B";
@@ -230,3 +248,16 @@ function analyze(tags, pageTitle, url) {
     present,
   };
 }
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/og-check/audit" && request.method === "GET") {
+      return handleAudit(request);
+    }
+
+    // Fall through to static assets (HTML, CSS, images, etc.)
+    return env.ASSETS.fetch(request);
+  },
+};
