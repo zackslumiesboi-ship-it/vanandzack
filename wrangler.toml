@@ -1,0 +1,10 @@
+name = "vanandzack"
+main = "_worker.js"
+compatibility_date = "2026-05-02"
+compatibility_flags = ["nodejs_compat"]
+
+# Static-asset binding. Files in the directory below are served by the runtime
+# at their path. _worker.js, wrangler.toml and dotfiles are auto-excluded.
+[assets]
+directory = "./"
+binding = "ASSETS"
